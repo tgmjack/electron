@@ -6,9 +6,10 @@ import random
 import time
 
 # click 1 thing for all data
-# click another to clear screen
 # change e size
 # frame rate
+# ability to change charge on walls 
+##### add positive chargess 
 
 
 pygame.init()
@@ -16,6 +17,7 @@ light_grey=(228, 233, 229)
 dark_grey = (15,15,15)
 black = (0,0,0)
 yellow = (246,240,55)
+light_blue = (135,206,250)
 white = (255,255,255)
 red = (200,0,0)
 screen_width = 800
@@ -48,16 +50,13 @@ class electron():
     def force_between(self,x1,x2,y1,y2,charge1,charge2,e_0):
         x = x1-x2
         y = y1-y2
-        r = (x,y)
         r_len = ((x**2)+(y**2))**0.5
         pi = 3.14159265358987
         if r_len == 0:
             pass
         else:
             F = ((charge1*charge2)/(4*pi*e_0))/(r_len**2)
-            
             return(F)
-        
         
     def draw_e(self,x,y):
         black=(0,0,0)
@@ -67,20 +66,23 @@ class electron():
 def simulation():
     electron_dictionary = []
     click_delay = 0
-    number_of_electrons = 4
+    number_of_electrons = 1
+    walls_button_y = screen_height*0.3
     e = 1.0
-    mass_e = 0.00005
+    mass_e = 0.0005
+    wall_charge = 2
     new_electron = False
     speed_y_0_box = screen_height*0.5
     side_bar = screen_width*0.95
     new_e_button_height = screen_height*0.05
+    wall_charge_button =walls_button_y + new_e_button_height
     clear_button_y = screen_height*0.95
     for i in range(number_of_electrons):
         x=(random.uniform(0,screen_width))
         y=(random.uniform(0,screen_height))
         electron_dictionary.append(electron(x,y,e,0.0,0.0,i))
     a = 0
-    no_walls = True
+    no_walls = False
     while a < 9:
         display.fill(white)
         for event in pygame.event.get():
@@ -106,6 +108,16 @@ def simulation():
                     for i in electron_dictionary:
                         i.speed_x = 0
                         i.speed_y = 0
+            if mouse[0] > side_bar and walls_button_y<mouse[1]<walls_button_y +new_e_button_height:
+                print("wwwwwwwwwwwwwwwwwwwww")
+                if click[0] == True and click_delay == 0 and no_walls == True:
+                    no_walls = False
+                    print("333333")
+                    click_delay+=1
+                if click[0] == True and click_delay == 0 and no_walls == False:
+                    no_walls = True
+                    click_delay+=1
+                    print("44444")
         if new_electron == True and mouse[0]<side_bar:
             pygame.draw.line(display, black,(mouse[0]-7,mouse[1]-7),(mouse[0]+7,mouse[1]+7),3) #
             pygame.draw.line(display, black,(mouse[0]-7,mouse[1]+7),(mouse[0]+7,mouse[1]-7),3)
@@ -128,18 +140,41 @@ def simulation():
                         i.speed_y += abs((force/mass_e)*math.sin(theta))*(dy/(dy+dx))
                     if i.y < j.y and dy+dx != 0:
                         i.speed_y += -abs((force/mass_e)*math.sin(theta))*(dy/(dy+dx))
-                    if no_walls == True:
-                        if i.x>side_bar-1 and i.speed_x > 0:
-                            i.x = 0
-                        if  i.x<1 and i.speed_x < 0:
-                            i.x = side_bar-1
-        
-                        if  i.y>screen_height-2 and i.speed_y > 0:
-                            i.y = 0
-                        if  i.y<1 and i.speed_y < 0:
-                            i.y = screen_width
-                    i.x += i.speed_x
-                    i.y += i.speed_y
+                if no_walls == True:
+                    if i.x>side_bar-1 and i.speed_x > 0:
+                        i.x = 0
+                    if  i.x<1 and i.speed_x < 0:
+                        i.x = side_bar-1        
+                    if  i.y>screen_height-2 and i.speed_y > 0:
+                        i.y = 0
+                    if  i.y<1 and i.speed_y < 0:
+                        i.y = screen_width
+                            #force_between(self,x1,x2,y1,y2,charge1,charge2,e_0):
+                if no_walls == False:
+                    if i.x < side_bar/2:
+                        force = i.force_between(i.x,0,i.y,i.y,i.charge,wall_charge,1.0)
+                        i.speed_x += abs(force/mass_e)
+                    if i.x > side_bar/2:
+                        force = i.force_between(i.x,side_bar,i.y,i.y,i.charge,wall_charge,1.0)
+                        i.speed_x += -abs(force/mass_e)
+                    if i.y > screen_height/2:
+                        force = i.force_between(i.x,i.x,i.y,screen_height,i.charge,wall_charge,1.0)
+                        i.speed_y += -abs(force/mass_e)
+                    if i.y < screen_height/2:
+                        force = i.force_between(i.x,i.x,i.y,0,i.charge,wall_charge,1.0)
+                        i.speed_y += abs(force/mass_e)
+                if no_walls == True:
+                    if i.x < 0:
+                        i.x = side_bar
+                    if i.x > side_bar:
+                        i.x = 0
+                    if i.y > screen_height:
+                        i.y = 1
+                    if i.y < 0:
+                        i.y = screen_height -1
+                    
+                i.x += i.speed_x
+                i.y += i.speed_y
                     
             
                                 
@@ -147,18 +182,33 @@ def simulation():
             click_delay = 0
         if click_delay > 0:
             click_delay+=1
+            
+        if no_walls == False:
+            pygame.draw.rect(display, light_blue,[side_bar-1, 0, 2, screen_height])
+            pygame.draw.rect(display, light_blue,[0, 0, 2, screen_height])
+            pygame.draw.rect(display, light_blue,[0, 0, screen_width, 2])
+            pygame.draw.rect(display, light_blue,[0, screen_height - 2, screen_width, 2])
         pygame.draw.rect(display, light_grey,[side_bar, 0, 500, screen_height])            
         pygame.draw.rect(display, dark_grey,[side_bar, 0, 500, new_e_button_height])
-
+        pygame.draw.rect(display, dark_grey,[side_bar, walls_button_y, 500, new_e_button_height])
         pygame.draw.rect(display, dark_grey,[side_bar, speed_y_0_box, 500, new_e_button_height])
         message_diplay(side_bar+ 20, 22 ,"add", 15, white)
         message_diplay(side_bar+ 20, speed_y_0_box + 22 ,"speed=0", 10, white)
         pygame.draw.rect(display, red,[side_bar, clear_button_y, 500, new_e_button_height])
         message_diplay(side_bar + 20, clear_button_y+20,"clear", 15, white)
+        if no_walls == False:
+            message_diplay(side_bar+ 20, walls_button_y+15 ,"remove ", 11, red)
+            message_diplay(side_bar+ 20, walls_button_y+23 ,"walls ", 11, red)
+        if no_walls == True:
+            message_diplay(side_bar+ 20, walls_button_y+8 ,"add", 11, red)
+            message_diplay(side_bar+ 20, walls_button_y+15 ,"charged", 11, red)
+            message_diplay(side_bar+ 20, walls_button_y+23 ,"  edges", 11, red)
+            
+            
         pygame.display.update()
-        clock.tick(120)
+        clock.tick(100)
 
 simulation()
 pygame.quit()
 quit()
-                                    
+           
