@@ -51,26 +51,62 @@ class electron():
     def recieve_all_forces(self, electrons, positrons, no_walls):
         x_forces = []
         y_forces = []
+        print(str(type(self))+ "   we are currrently ")
         for e in electrons:
-            if self.y - e.y != 0:
-                theta = math.atan((self.x-e.x)/(self.y-e.y))
-            else:
-                theta = 1
-            force= self.force_between(self.x , e.x , self.y , e.y, self.charge, e.charge, 1.0)
-#            x = force * math.cos(theta)
- #           y = force * math.sin(theta)
+            if e != self:
+                print("theres this e ")
+                if self.y - e.y != 0:
+                    theta = math.atan((self.x-e.x)/(self.y-e.y))
+                else:
+                    theta = 1
+                force= self.force_between(self.x , e.x , self.y , e.y, self.charge, e.charge, 1.0)
+    #            x = force * math.cos(theta)
+     #           y = force * math.sin(theta)
+                print(force)
+                if force != 0:
+                    
+                    dx = self.x - e.x              
+                    dy = self.y - e.y
+                    if self.x > e.x and dy+dx != 0 :
+                        print(str(self.speed_x)+ " self.speed_x   ere ")
+                        self.speed_x += abs((force/mass_e)*math.cos(theta)) *(dx/(dy+dx))
+                        print(str(self.speed_x)+ " self.speed_x  aft")
+                    if self.x < e.x and dy+dx != 0:
+                        print(str(self.speed_x)+ " self.speed_x   ere ")
+                        self.speed_x += -abs((force/mass_e)*math.cos(theta))*(dx/(dy+dx))
+                        print(str(self.speed_x)+ " self.speed_x  aft")
+                    if self.y > e.y and dy+dx != 0:
+                        self.speed_y += abs((force/mass_e)*math.sin(theta))*(dy/(dy+dx))
+                    if self.y < e.y and dy+dx != 0:
+                        self.speed_y += -abs((force/mass_e)*math.sin(theta))*(dy/(dy+dx))
 
-            if force > 0:
-                dx = self.x - e.x              
-                dy = self.y - e.y
-                if self.x > e.x and dy+dx != 0 :
-                    self.speed_x += abs((force/mass_e)*math.cos(theta)) *(dx/(dy+dx))
-                if self.x < e.x and dy+dx != 0:
-                    self.speed_x += -abs((force/mass_e)*math.cos(theta))*(dx/(dy+dx))
-                if self.y > e.y and dy+dx != 0:
-                    self.speed_y += abs((force/mass_e)*math.sin(theta))*(dy/(dy+dx))
-                if self.y < e.y and dy+dx != 0:
-                    self.speed_y += -abs((force/mass_e)*math.sin(theta))*(dy/(dy+dx))
+        for p in positrons:
+            if p != self:
+                print("theres this p ")
+                if self.y - p.y != 0:
+                    theta = math.atan((self.x-p.x)/(self.y-p.y))
+                else:
+                    theta = 1
+                force= self.force_between(self.x , p.x , self.y , p.y, self.charge, p.charge, 1.0)
+    #            x = force * math.cos(theta)
+     #           y = force * math.sin(theta)
+                print(force)
+                if force != 0:
+                    
+                    dx = self.x - p.x              
+                    dy = self.y - p.y
+                    if self.x > p.x and dy+dx != 0 :
+                        print(str(self.speed_x)+ " self.speed_x   ere ")
+                        self.speed_x += abs((force/mass_e)*math.cos(theta)) *(dx/(dy+dx))
+                        print(str(self.speed_x)+ " self.speed_x  aft")
+                    if self.x < p.x and dy+dx != 0:
+                        print(str(self.speed_x)+ " self.speed_x   ere ")
+                        self.speed_x += -abs((force/mass_e)*math.cos(theta))*(dx/(dy+dx))
+                        print(str(self.speed_x)+ " self.speed_x  aft")
+                    if self.y > p.y and dy+dx != 0:
+                        self.speed_y += abs((force/mass_e)*math.sin(theta))*(dy/(dy+dx))
+                    if self.y < p.y and dy+dx != 0:
+                        self.speed_y += -abs((force/mass_e)*math.sin(theta))*(dy/(dy+dx))
 
                 #### if there are walls around the edge, feel a force from them
         if no_walls == False:
@@ -97,9 +133,11 @@ class electron():
             if self.y < 0:
                 self.y = 2.0
 
-
+        print(str(self.speed_x)+ " self.speed_x ")
         self.x += self.speed_x
         self.y += self.speed_y
+        print("aight")
+
     #    if i.y < 1:
     #        i.y = screen_height
 
@@ -132,10 +170,7 @@ class electron():
                 i.y = 0.0
             if  i.y<1 and i.speed_y < 0:
                 i.y = float(screen_height)  """
-
-
-
-
+        
          ## ie ) if we go off the lerft side of screeen we should re enter from the right and vice versa
         if no_walls == True:
             if self.x < 0:
@@ -166,6 +201,7 @@ def event_handle( new_electron , new_positron , choose_new_wall_charge , click_d
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
         if new_electron == True:
+            print("new electron true ")
             if mouse[0]<side_bar:
                 if click[0] == True and click_delay == 0:
                     click_delay+=1
@@ -180,11 +216,14 @@ def event_handle( new_electron , new_positron , choose_new_wall_charge , click_d
                     new_positron = False
                     number_of_positrons+=1
                     positrons.append(positron(mouse[0],mouse[1],e,0,0,number_of_positrons))
-
+        print(str(click_delay)+ "             click_delay   ")
         if mouse[0] > side_bar and mouse[1]<new_e_button_height:
+            print("click for new e")
             if click[0] == True and click_delay == 0:
                 new_electron = True
                 click_delay+=1
+                print("carrying  new e")
+                time.sleep(5)
         if mouse[0] > side_bar and mouse[1]>clear_button_y:
             if click[0] == True and click_delay == 0:
                 electrons = []
@@ -339,9 +378,9 @@ bring_back_y =  bring_back_button_y
 
 
 
-e = -1.0
+e = -10.0
 y_list_ticker=0
-mass_e = 0.002
+mass_e = 0.0002
 too_far = 400
 wall_charge = -1.0
 
@@ -350,8 +389,8 @@ wall_charge = -1.0
 def simulation():
     click_delay = 0
 
-    number_of_electrons = 1
-    number_of_positrons = 1
+    number_of_electrons = 3
+    number_of_positrons = 3
     
     new_electron = False
     new_positron = False
@@ -398,6 +437,8 @@ def simulation():
         pygame.display.update()
         clock.tick(20)
         print("uno")
+      #  time.sleep(120)
+      #  time.sleep(5)
         
     pygame.quit()
     sys.exit()
