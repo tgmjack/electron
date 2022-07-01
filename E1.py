@@ -9,7 +9,8 @@ import time
 # frame rate controls
 # fix up actual gauss
 # tidy up
-# ,=make build 
+# ,=make build
+
 
 pygame.init()
 light_grey=(228, 233, 229)
@@ -64,8 +65,8 @@ class electron():
      #           y = force * math.sin(theta)
                 print(force)
                 if force != 0:
-                    
-                    dx = self.x - e.x              
+
+                    dx = self.x - e.x
                     dy = self.y - e.y
                     if self.x > e.x and dy+dx != 0 :
                         print(str(self.speed_x)+ " self.speed_x   ere ")
@@ -92,8 +93,8 @@ class electron():
      #           y = force * math.sin(theta)
                 print(force)
                 if force != 0:
-                    
-                    dx = self.x - p.x              
+
+                    dx = self.x - p.x
                     dy = self.y - p.y
                     if self.x > p.x and dy+dx != 0 :
                         print(str(self.speed_x)+ " self.speed_x   ere ")
@@ -170,7 +171,7 @@ class electron():
                 i.y = 0.0
             if  i.y<1 and i.speed_y < 0:
                 i.y = float(screen_height)  """
-        
+
          ## ie ) if we go off the lerft side of screeen we should re enter from the right and vice versa
         if no_walls == True:
             if self.x < 0:
@@ -391,11 +392,11 @@ def simulation():
 
     number_of_electrons = 3
     number_of_positrons = 3
-    
+
     new_electron = False
     new_positron = False
     choose_new_wall_charge = False
-    no_walls = True    
+    no_walls = True
 
 ####### this section creates initial particles in an evenly disributed grid
     electrons = []
@@ -439,7 +440,7 @@ def simulation():
         print("uno")
       #  time.sleep(120)
       #  time.sleep(5)
-        
+
     pygame.quit()
     sys.exit()
 
