@@ -2,11 +2,10 @@ from pygame_stuff import *
 from particles import *
 
 ###### to do 
-### could i not replace number_of_electrons , number_of_positrons with len electrons
+### just replace number_of_electrons , number_of_positrons with len electrons
 ### change e variable to charge
-### mess with e constant 
-### fix going offscreen with barriers 
-### make barriers clearer to see 
+### change to non linear acceleration to fix a bunch of problems
+### 
 
 def simulation():
     display, clock = initialize()
@@ -39,18 +38,20 @@ def simulation():
         display.fill(white)
         draw_ui_n_walls(no_walls, choose_new_wall_charge , number_of_positrons , number_of_electrons  , display)
                                                                                    #( new_electron , new_positron , choose_new_wall_charge , click_delay, electrons, positrons  , display, number_of_electrons , number_of_positrons , no_walls)
-        new_electron, new_positron, click_delay , electrons , positrons, no_walls = event_handle( new_electron , new_positron , choose_new_wall_charge , click_delay , electrons, positrons , display , number_of_electrons , number_of_positrons , no_walls)
-
+        new_electron, new_positron, click_delay , electrons , positrons, no_walls , choose_new_wall_charge, particles.wall_charge = event_handle( new_electron , new_positron , choose_new_wall_charge , click_delay , electrons, positrons , display , number_of_electrons , number_of_positrons , no_walls)
+        
         for i in electrons:
             #recieve_all_forces(self, electrons, positrons, no_walls)
             i.recieve_all_forces(electrons, positrons, no_walls , side_bar, screen_height)
             i.position_manager(no_walls  , side_bar , screen_height)
             i.draw(display)
+            write_id_num(i.id , display, i.x , i.y)
 
         for p in positrons:
             p.recieve_all_forces(electrons, positrons, no_walls , side_bar, screen_height)
             p.position_manager(no_walls  , side_bar , screen_height)
             p.draw(display)
+            write_id_num(p.id, display, p.x , p.y)
 
 
         if click_delay == 5:

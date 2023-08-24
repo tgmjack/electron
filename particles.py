@@ -111,10 +111,20 @@ class electron():
                 self.speed_y += float(abs(force/mass_e))
             if self.y < 0:
                 self.y = 2.0
+            
 
  #       print(str(self.speed_x)+ " self.speed_x ")
-        self.x += self.speed_x
-        self.y += self.speed_y
+        if no_walls == False:
+            does_this_get_past_barriers = self.does_this_move_past_barriers_next_frame([self.x + self.speed_x , self.y + self.speed_y], side_bar, screen_height)
+            if does_this_get_past_barriers[0] != False:
+                self.x = does_this_get_past_barriers[0]
+                self.y = does_this_get_past_barriers[1]
+            else:
+                self.x += self.speed_x
+                self.y += self.speed_y
+        else:
+            self.x += self.speed_x
+            self.y += self.speed_y
 #        time.sleep(1)
 #        print("aight")
 
@@ -141,18 +151,9 @@ class electron():
     def draw(self , display):
         pygame.draw.circle(display, self.colour,(int(self.x), int(self.y)), 6,6)
 
+
     def position_manager(self , no_walls , side_bar , screen_height):
 
-        maybe_old_crap = """
-        if no_walls == True:  ## ie ) if we go off the lerft side of screeen we should re enter from the right and vice versa
-            if i.x>side_bar-1 and i.speed_x > 0:
-                i.x = 0.0
-            if  i.x<1 and i.speed_x < 0:
-                i.x = float(side_bar-1 )
-            if  i.y>screen_height-2 and i.speed_y > 0:
-                i.y = 0.0
-            if  i.y<1 and i.speed_y < 0:
-                i.y = float(screen_height)  """
 
          ## ie ) if we go off the lerft side of screeen we should re enter from the right and vice versa
         if no_walls == True:
@@ -164,6 +165,26 @@ class electron():
                 self.y = 1
             if self.y < 0:
                 self.y = screen_height -1
+    
+    def does_this_move_past_barriers_next_frame(self, next_pos, side_bar, screen_height):
+        if next_pos[0] < 0.00001 and (screen_height > next_pos[1] > 0.00001): # if just off left edge
+            return [1, next_pos[1]]
+        elif (side_bar > next_pos[0] > 0.00001) and (next_pos[1] < 0.00001): # if just off top edge
+            return [next_pos[0] , 1]
+        elif (next_pos[0] > side_bar-0.00001) and (screen_height > next_pos[1] > 0.00001): # if just off right edge
+            return [side_bar-1, next_pos[1]]
+        elif (side_bar > next_pos[0] > 0.00001) and (next_pos[1] > screen_height): # if just off bottom edge
+            return [next_pos[0] , screen_height-1]
+        elif next_pos[0] < 0.00001 and (next_pos[1] < 0.00001): # if off top left
+            return [1, 1]
+        elif next_pos[0] > side_bar - 0.00001 and (next_pos[1] < 0.00001): # if off top right
+            return [side_bar - 1, 1]
+        elif next_pos[0] > side_bar - 0.00001 and (next_pos[1] > screen_height - 0.00001): # if off bottom right
+            return [side_bar - 1, screen_height - 1]
+        elif next_pos[0] < 0.00001 and (next_pos[1] > screen_height - 0.00001): # if off bottom left
+            return [1, screen_height - 1]
+        else:
+            return [False, False]
 
 class positron(electron):
     def __init__(self,x,y,charge,speed_x,speed_y,electron_number , colour , thisid):
